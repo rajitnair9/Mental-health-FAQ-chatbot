@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="{{ url_for('static', filename='images/icon.ico') }}">
+    <title>MindMate - Mental health chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <button id="logout-button" onclick="logout()"><span class="power">&#x23FB;</span>logout</button>
+    <script>
+    function logout() {
+      window.location = "{{ url_for('logout') }}";
+    }
+    </script>
+    <style>
+      body {
+        background-image: url("{{ url_for('static', filename='images/peakpx.jpg') }}");
+        background-size: cover;
+        background-position: center;
+      }
+      #logout-button {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+      }
+    </style>
+  
+  </head>
+
+  <body id="body-area">
+    <div id="chat-container">
+      <div id="chat-header">
+        <h1 id="logo"><img src="{{ url_for('static', filename='images/logo.ico')}}" alt="logo" >MindMate</h1>
+      </div>
+      <div id="chat-area">
+        <!-- Display previous chat messages -->
+        {% for chat in chat_history %}
+          <div class="user-msg"><span class="msg">{{ chat.message }}</span></div>
+          <div class="bot-msg"><span class="msg">{{ chat.response }}</span></div>
+        {% endfor %}
+      </div>
+      <div id="input-container">
+        <input type="text" id="user-input" placeholder="Type your message..." onkeydown="if(event.keyCode===13) sendMessage()">
+        <button id="send-btn" onclick="sendMessage()" type="button">Send</button>
+      </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+      function sendMessage() {
+        var message = $("#user-input").val();
+        $("#chat-area").append('<div class="user-msg"><span class="msg">' + message + '</span></div>');
+        $.get("/get", {msg: message}).done(function(data) {
+          $("#chat-area").append('<div class="bot-msg"><span class="msg">' + data + '</span></div>');
+          $("#chat-area").scrollTop($("#chat-area")[0].scrollHeight);
+        });
+        $("#user-input").val("");
+      }
+      window.onload = function() {
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.href);
+        }
+    }
+    </script>
+  </body>
+</html>
